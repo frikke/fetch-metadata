@@ -30,21 +30,21 @@ jobs:
     steps:
       - name: Generate token
         id: generate_token
-        uses: tibdex/github-app-token@0d49dd721133f900ebd5e0dff2810704e8defbc6 # v1.8.2
+        uses: actions/create-github-app-token@5d869da34e18e7287c1daad50e0b8ea0f506ce69 # v1.11.0
         with:
-          app_id: ${{ secrets.FETCH_METADATA_ACTION_AUTOMATION_APP_ID }}
-          private_key: ${{ secrets.FETCH_METADATA_ACTION_AUTOMATION_PRIVATE_KEY }}
+          app-id: ${{ secrets.FETCH_METADATA_ACTION_AUTOMATION_APP_ID }}
+          private-key: ${{ secrets.FETCH_METADATA_ACTION_AUTOMATION_PRIVATE_KEY }}
 
       - uses: actions/checkout@v4
         with:
           token: ${{ steps.generate_token.outputs.token }}
 
       - name: Move the tracking tag
-        run: git tag -f v1
+        run: git tag -f v2
 
       - name: Push the new tag value back to the repo
-        run: git push -f origin refs/tags/v1
+        run: git push -f origin refs/tags/v2
 
       - name: Set summary
         run: |
-          echo ":rocket: Successfully moved the \`v1\` tag to point at release: ${{ github.event.release.name }} with SHA: \`$GITHUB_SHA\`." >> $GITHUB_STEP_SUMMARY
+          echo ":rocket: Successfully moved the \`v2\` tag to point at release: ${{ github.event.release.name }} with SHA: \`$GITHUB_SHA\`." >> $GITHUB_STEP_SUMMARY

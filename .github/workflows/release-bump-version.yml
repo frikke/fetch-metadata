@@ -1,6 +1,8 @@
 name: Release - Bump Version
 
-on:
+on:  # yamllint disable-line rule:truthy
+  schedule:
+    - cron: '0 0 1 * *'
   workflow_dispatch:
     inputs:
       version_type:
@@ -20,10 +22,10 @@ jobs:
     steps:
       - name: Generate token
         id: generate_token
-        uses: tibdex/github-app-token@0d49dd721133f900ebd5e0dff2810704e8defbc6 # v1.8.2
+        uses: actions/create-github-app-token@5d869da34e18e7287c1daad50e0b8ea0f506ce69 # v1.11.0
         with:
-          app_id: ${{ secrets.FETCH_METADATA_ACTION_AUTOMATION_APP_ID }}
-          private_key: ${{ secrets.FETCH_METADATA_ACTION_AUTOMATION_PRIVATE_KEY }}
+          app-id: ${{ secrets.FETCH_METADATA_ACTION_AUTOMATION_APP_ID }}
+          private-key: ${{ secrets.FETCH_METADATA_ACTION_AUTOMATION_PRIVATE_KEY }}
 
       - uses: actions/checkout@v4
         with:
@@ -31,13 +33,12 @@ jobs:
           ref: "main"
           token: ${{ steps.generate_token.outputs.token }}
 
-      - uses: actions/setup-node@v3 # bin/bump-version needs npm
+      - uses: actions/setup-node@v4 # bin/bump-version needs npm
         with:
           node-version-file: .nvmrc
 
       - name: Bump the version
-        # Currently we don't run via `schedule` trigger since this repo isn't active enough.
-        # However, if that ever changes, it will run with no inputs, so version_type will default to 'minor'
+        # Cron runs with no inputs, so version_type will default to 'minor'
         run: |
           NEW_VERSION=$(bin/bump-version ${{ github.event.inputs.version_type || 'minor' }})
           echo "New version is: $NEW_VERSION"
@@ -87,4 +88,4 @@ jobs:
           echo "    > https://github.com/${{ github.repository }}/releases/tag/untagged-XXXXXX" >> $GITHUB_STEP_SUMMARY
           echo "    # Use the generated URL to review/edit the release notes." >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "Once the release is tagged, another GitHub Action workflow automatically moves the floating \`v1\` tag to point at this release." >> $GITHUB_STEP_SUMMARY
+          echo "Once the release is tagged, another GitHub Action workflow automatically moves the floating \`v2\` tag to point at this release." >> $GITHUB_STEP_SUMMARY
